@@ -63,6 +63,6 @@ Optional: WhatsApp / Telegram integration for chatbot deployment
     ```
 3. Run:
    ```bash
-   uvicorn main:app --reload
-   python app.py
+   docker build -t tutorbot .
+   docker run -p 8000:8000 tutorbot
    ```
