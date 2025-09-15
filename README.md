@@ -7,6 +7,15 @@ This project showcases multi-agent orchestration, RAG pipelines, and multi-langu
 
 ---
 
+# In Building Project:
+Next steps:
+1. Add the initial structure ✅
+2. Add the agent workflow 🔁
+3. Add the API logic and user interaction
+4. Make a simple frontend to improve the usabillity
+
+---
+
 🔹 Features
   * Answer ML & Data Science questions in multiple languages
 
