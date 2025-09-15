@@ -3,8 +3,6 @@ Your AI Data Science Tutor
 
 ML TutorBot is a multilingual, AI-powered Data Science & Machine Learning tutor. It helps users understand ML/DS concepts, libraries, and techniques in a conversational way, using Retrieval-Augmented Generation (RAG) to provide accurate, contextual answers from curated knowledge sources.
 
-This project showcases multi-agent orchestration, RAG pipelines, and multi-language NLP, making it an excellent portfolio project for data scientists and ML engineers.
-
 ---
 
 ## 🗺️ Road Map:
