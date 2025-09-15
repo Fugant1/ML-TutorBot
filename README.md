@@ -65,11 +65,11 @@ Optional: WhatsApp / Telegram integration for chatbot deployment
   cd ml-tutorbot
   ```
 2. Install the dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+  ```bash
+  pip install -r requirements.txt
+  ```
 3. Run:
-   ```bash
-   docker build -t tutorbot .
-   docker run -p 8000:8000 tutorbot
-   ```
+  ```bash
+  docker build -t tutorbot .
+  docker run -p 8000:8000 tutorbot
+  ```
