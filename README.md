@@ -7,7 +7,7 @@ This project showcases multi-agent orchestration, RAG pipelines, and multi-langu
 
 ---
 
-# In Building Project:
+## 🗺️ Road Map:
 Next steps:
 1. Add the initial structure ✅
 2. Add the agent workflow 🔁
@@ -16,7 +16,7 @@ Next steps:
 
 ---
 
-🔹 Features
+## 🔹 Features
   * Answer ML & Data Science questions in multiple languages
 
   * Uses RAG to retrieve context from official documentation, tutorials, and open-access books
