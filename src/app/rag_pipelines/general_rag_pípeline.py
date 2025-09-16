@@ -11,37 +11,42 @@ from ..core.config import URLS
 from scrapping_manager import Scrap_manager
 
 class Rag_Pipeline:
-    def __init__(self, llm):
-        self.llm = llm
+    def __init__(self):
+        self.embedded_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     async def _scrapp_data(self, URLS=URLS):
+        #throw the urls to the scrap manager to get all the data and save it in a csv :)
         scp = Scrap_manager(URLS)
         scp.scrapp_and_save()
 
     async def _load_docs(self):
-        docs = CSVLoader(file_path='./data/data.csv', csv_args={'delimiter':';'}).load()
+        #pick all the data and load it to be processed
+        docs = await CSVLoader(file_path='./data/data.csv', csv_args={'delimiter':';'}).aload()
         return docs
 
     async def _split_docs(self, docs):
+        #just splits the daa in chunks
         data = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(docs)
         return data
 
-    async def _embedd(self, data):
-        pass
-
-    async def _vec_store(self, embedded_data):
-        pass
+    async def _embedd_and_vec_store(self, splited_data):
+        #just embedds
+        await Chroma.afrom_documents(documents=splited_data, embedding=self.embedded_model, persist_directory="./chroma_db")
 
     async def _retrieve(self, input):
-        pass
+        #retrieve the most relevant data
+        vector_store = Chroma(persist_directory="./chroma_db", embedding_function=self.embedded_model)
+        retrieve = vector_store.as_retriever()
+        retrieved = await retrieve.ainvoke(input)
+        return retrieved
 
     async def query_docs(self, input):
+        #abstraction to call all the internal steps, just runs the pipeline and returns the query, aka the relevant docs
         if not os.path.exists('./data'):
-            self._scrapp_data()
+            await self._scrapp_data()
         if not os.path.exists('./chroma_db'):
-            docs = self._load_docs()
-            data = self._split_docs(docs)
-            embedded_data = self._embedd(data)
-            self._vec_store(embedded_data)
-        query = self._retrieve(input)
+            docs = await self._load_docs()
+            splited_data = await self._split_docs(docs)
+            await self._embedd_and_vec_store(splited_data)
+        query = await self._retrieve(input)
         return query
