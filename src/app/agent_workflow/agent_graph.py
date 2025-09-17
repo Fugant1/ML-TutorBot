@@ -54,7 +54,9 @@ async def rag_retriever_node(state: ChatState):
     return state
 
 async def code_interpreter_node(state: ChatState):
-    #will think what to do here, maybe run it in a sandboxed env via docker?? Idk, acept suggestions
+    #this node is a bit more complex, we have a code spliter and interpreter and a final explainer and code builder
+    #the first LLM will split the input in code and text and will return a brief description of what the code does or what error it has
+    #the second LLM will be given the input, the code, the description and the output of the code, and will explain what the code does or what error it has and why
     llm1 = None
     llm2 = None
     prompt1 = ChatPromptTemplate.from_messages([
