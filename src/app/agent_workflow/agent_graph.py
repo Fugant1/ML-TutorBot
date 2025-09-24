@@ -108,7 +108,7 @@ async def final_answer_node(state: ChatState):
     state['output'] = response.content
     return state
 
-def create_graph():
+def create_graph(google_api_key):
     #will add here the option of not use some tool, or adding other tools
     possible_tools = ['rag_retriever', 'code_interpreter']
     builder = StateGraph.Builder()
