@@ -1,6 +1,9 @@
 import os
+import csv
+import sys
 import asyncio
 from langchain_community.document_loaders import CSVLoader
+from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -20,6 +23,27 @@ class Rag_Pipeline:
         print("Entering scrapping phase...")
         scp = Scrap_manager(URLS)
         await scp.scrapp_and_save()
+
+    async def _load_and_split_large_csv(self, file_path: str, content_column: str, source_column: str):
+        csv.field_size_limit(sys.maxsize)
+
+        all_docs = []
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+
+        with open(file_path, mode='r', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile, delimiter=',') 
+            for row in reader:
+                content = row[content_column]
+                source = row[source_column]
+                metadata = {"source": source}
+                if len(content) > 1000:
+                    chunks = text_splitter.create_documents([content], metadatas=[metadata])
+                    all_docs.extend(chunks)
+                else:
+                    doc = Document(page_content=content, metadata=metadata)
+                    all_docs.append(doc)
+
+        return all_docs
 
     async def _load_docs(self):
         #pick all the data and load it to be processed
@@ -46,16 +70,17 @@ class Rag_Pipeline:
         #abstraction to call all the internal steps, just runs the pipeline and returns the query, aka the relevant docs
         if not os.path.exists('data/data.csv'):
             await self._scrapp_data()
-        if not os.path.exists('/chroma_db'):
-            docs = await self._load_docs()
-            splited_data = await self._split_docs(docs)
+        if not os.path.exists('./chroma_db'):
+            #docs = await self._load_docs()
+            #splited_data = await self._split_docs(docs)
+            splited_data = await self._load_and_split_large_csv('data/data.csv', 'text', 'source')
             await self._embedd_and_vec_store(splited_data)
         query = await self._retrieve(input)
         return query
     
 if __name__ == '__main__':
     qd = Rag_Pipeline()
-    related_text = asyncio.run(qd.query_docs("How can I install scikit-learn?"))
+    related_text = asyncio.run(qd.query_docs("Logistic Regression"))
     for doc in related_text:
         print(f"Document source: {doc.metadata.get('source', 'N/A')}")
         print(f"Document content: {doc.page_content}\n")

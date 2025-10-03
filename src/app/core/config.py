@@ -1,4 +1,4 @@
-URLS_DOCS = ['https://scikit-learn.org/stable/user_guide.htmls',
+URLS_DOCS = ['https://scikit-learn.org/stable/user_guide',
         'https://www.tensorflow.org/tutorials',
         'https://docs.pytorch.org/tutorials/',
         'https://pandas.pydata.org/docs/user_guide/index.html',
