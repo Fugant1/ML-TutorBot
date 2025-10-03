@@ -4,7 +4,7 @@ from langchain_experimental.tools.python.tool import PythonAstREPLTool
 from typing import TypedDict
 import logging
 
-from src.app.rag_pipelines.general_rag_pípeline import Rag_Pipeline
+from src.app.rag_pipelines.general_rag_pipeline import Rag_Pipeline
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') 
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from scrapp_data import scrapp_data
+from app.rag_pipelines.scrapp_data import scrapp_data
 
 class Scrap_manager():
     def __init__(self, URLS):
@@ -9,7 +9,9 @@ class Scrap_manager():
         docs = []
         for url in self.urls:
             if url != '':
-                docs.extend(await scrapp_data(url))
+                loaded_doc = scrapp_data(url)
+                docs.extend(loaded_doc)
+                print(f"Scrapped {url} with {len(loaded_doc)} documents.")
         return docs
     
     async def scrapp_and_save(self):
@@ -22,4 +24,4 @@ class Scrap_manager():
             for doc in docs
         ]
         df = pd.DataFrame(data_to_df)
-        df.to_csv('./data/data.csv', index=False)
+        df.to_csv('data/data.csv', index=False)
