@@ -1,12 +1,16 @@
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import GoogleGenAI
 from langgraph.graph import StateGraph, END
 from langchain_experimental.tools.python.tool import PythonAstREPLTool
 from typing import TypedDict
 import logging
+import os
 
 from src.app.rag_pipelines.general_rag_pipeline import Rag_Pipeline
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') 
+
+LLM = os.getenv("GOOGLE_API_KEY") #You need to set your Google API key here to this whole app run properly
 
 #Chatstate to help maintaining some data while navigating the nodes of the graph
 class ChatState(TypedDict):
@@ -16,10 +20,10 @@ class ChatState(TypedDict):
     tool_results: list[dict]
     retries: int
 
-async def router_node(state: ChatState, possible_tools:list[str]):
+async def router_node(state: ChatState, google_api_key, possible_tools:list[str]):
     #this node is the main node, it starts here and defines all the next steps
     #the router will decide which tool to use, the code interpreter or the RAG to help the user
-    llm = None 
+    llm = GoogleGenAI(model="gemini-2.5-flash-lite", api_key=google_api_key)
     #added a retry system to handle unpredicted behavior of the model
     state['retries'] = 0
     try:
@@ -57,8 +61,8 @@ async def code_interpreter_node(state: ChatState):
     #this node is a bit more complex, we have a code spliter and interpreter and a final explainer and code builder
     #the first LLM will split the input in code and text and will return a brief description of what the code does or what error it has
     #the second LLM will be given the input, the code, the description and the output of the code, and will explain what the code does or what error it has and why
-    llm1 = None
-    llm2 = None
+    llm1 = LLM
+    llm2 = LLM
     prompt1 = ChatPromptTemplate.from_messages([
         ("system", """You are a code interpreter that is experts in python, what you will do:
             - Analyze the input and split in text and code
@@ -91,7 +95,7 @@ async def code_interpreter_node(state: ChatState):
 async def final_answer_node(state: ChatState):
     #as simple as it looks, just give all the info to the model and let it answer
     #it will have the input, and the tool_results with the info of the RAG or the code interpreter if used
-    llm = None
+    llm = LLM
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are an expert in python and machine learning, what you will do:
             - You will be given the input and the results of some tools that were used to help you give the best answer possible
@@ -108,15 +112,15 @@ async def final_answer_node(state: ChatState):
     state['output'] = response.content
     return state
 
-def create_graph(google_api_key):
+def create_graph(google_api_key: str):
     #will add here the option of not use some tool, or adding other tools
     possible_tools = ['rag_retriever', 'code_interpreter']
     builder = StateGraph.Builder()
 
-    builder.add_node("router", lambda state: router_node(state, possible_tools))
+    builder.add_node("router", lambda state: router_node(state, google_api_key, possible_tools))
     builder.add_node("rag_retriever", rag_retriever_node)
-    builder.add_node("code_interpreter", code_interpreter_node)
-    builder.add_node("final_answer", final_answer_node)
+    builder.add_node("code_interpreter", lambda state: code_interpreter_node(state, google_api_key))
+    builder.add_node("final_answer", lambda state: final_answer_node(state, google_api_key))
     builder.set_entry_point("router")
     builder.add_conditional_edge("router", router_node, {
             "rag_retriever": "rag_retriever",
