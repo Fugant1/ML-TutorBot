@@ -10,9 +10,9 @@ ML TutorBot is a multilingual, AI-powered Data Science & Machine Learning tutor.
 ## 🗺️ Road Map:
 Next steps:
 1. Add the initial structure ✅
-2. Add the agent workflow 🔁
-3. Add the API logic and user interaction
-4. Make a simple frontend to improve the usabillity
+2. Add the agent workflow ✅
+3. Add the API logic and user interaction 🔁
+4. Make a simple frontend to improve the usabillity 🔁
 
 ---
 
