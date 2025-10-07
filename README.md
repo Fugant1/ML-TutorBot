@@ -47,17 +47,15 @@ Next steps:
 
 ## ⚡ Tech Stack
 
-Language Model: Gemini 2.5 Flash / Open-source LLM (no fine-tuning required)
+Language Model: Gemini 2.5 Flash Lite
 
 Embeddings: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 
-Vector Database: FAISS / Chroma / Weaviate
+Vector Database: Chroma
 
 Backend: FastAPI
 
-Interface: Gradio or Streamlit (chat interface)
-
-Optional: WhatsApp / Telegram integration for chatbot deployment
+Interface: Gradio 
 
 ## 🚀 Installation & Setup
 
