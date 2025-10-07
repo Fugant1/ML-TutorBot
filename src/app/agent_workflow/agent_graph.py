@@ -10,8 +10,6 @@ from src.app.rag_pipelines.general_rag_pipeline import Rag_Pipeline
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') 
 
-LLM = os.getenv("GOOGLE_API_KEY") #You need to set your Google API key here to this whole app run properly
-
 #Chatstate to help maintaining some data while navigating the nodes of the graph
 class ChatState(TypedDict):
     input: str

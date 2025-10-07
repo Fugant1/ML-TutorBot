@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-google_api_key = os.getenv("GOOGLE_API_KEY")
+google_api_key = os.getenv("GOOGLE_API_KEY") #You need to set your Google API key here to this whole app run properly
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
