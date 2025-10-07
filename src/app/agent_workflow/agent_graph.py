@@ -21,7 +21,7 @@ class ChatState(TypedDict):
 async def router_node(state: ChatState, google_api_key, possible_tools:list[str]):
     #this node is the main node, it starts here and defines all the next steps
     #the router will decide which tool to use, the code interpreter or the RAG to help the user
-    llm = GoogleGenAI(model="gemini-2.5-flash-lite", api_key=google_api_key)
+    llm = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
     #added a retry system to handle unpredicted behavior of the model
     state['retries'] = 0
     try:
@@ -55,12 +55,12 @@ async def rag_retriever_node(state: ChatState):
     state['tool_results'].append({'tool': 'rag_retriever', 'output': rag_data})
     return state
 
-async def code_interpreter_node(state: ChatState):
+async def code_interpreter_node(state: ChatState, google_api_key):
     #this node is a bit more complex, we have a code spliter and interpreter and a final explainer and code builder
     #the first LLM will split the input in code and text and will return a brief description of what the code does or what error it has
     #the second LLM will be given the input, the code, the description and the output of the code, and will explain what the code does or what error it has and why
-    llm1 = LLM
-    llm2 = LLM
+    llm1 = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
+    llm2 = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
     prompt1 = ChatPromptTemplate.from_messages([
         ("system", """You are a code interpreter that is experts in python, what you will do:
             - Analyze the input and split in text and code
@@ -90,10 +90,10 @@ async def code_interpreter_node(state: ChatState):
     state['tool_results'].append({'tool': 'code_interpreter', 'output': response2.content})
     return state
 
-async def final_answer_node(state: ChatState):
+async def final_answer_node(state: ChatState, google_api_key):
     #as simple as it looks, just give all the info to the model and let it answer
     #it will have the input, and the tool_results with the info of the RAG or the code interpreter if used
-    llm = LLM
+    llm = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0.7, api_key=google_api_key)
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are an expert in python and machine learning, what you will do:
             - You will be given the input and the results of some tools that were used to help you give the best answer possible
