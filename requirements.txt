@@ -1,0 +1,4 @@
+gradio
+langchain
+langgraph
+chromadb

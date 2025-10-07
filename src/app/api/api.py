@@ -13,9 +13,9 @@ async def lifespan(app: FastAPI):
     app.state.agent_graph = create_graph(google_api_key)
     yield
 
-app = FastAPI(lifespan=lifespan)
+chat_router = FastAPI(lifespan=lifespan)
 
-@app.get("/chat")
+@chat_router.get("/chat")
 def create_app(request: Request, input: str = Query(...)):
     agent_graph = request.app.state.agent_graph
     state = ChatState(input=input)
