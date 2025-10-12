@@ -1,0 +1,16 @@
+version: "3.11"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml_tutor_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - .:/app
+    restart: unless-stopped

@@ -2,3 +2,8 @@ gradio
 langchain
 langgraph
 chromadb
+PyQt6
+langchain-google-genai
+langchain-community
+bs4
+pandas
