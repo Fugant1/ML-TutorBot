@@ -62,14 +62,10 @@ Interface: Gradio
 
 1. Clone the repo:
   ```bash
-  git clone https://github.com/yourusername/ml-tutorbot.git
-  cd ml-tutorbot
+  git clone https://github.com/Fugant1/ML-TutorBot.git
+  cd ML-TutorBot
   ```
-2. Install the dependencies:
-  ```bash
-  pip install -r requirements.txt
-  ```
-3. Run:
+2. Run:
   ```bash
   docker compose build
   docker compose up
