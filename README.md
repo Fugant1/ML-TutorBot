@@ -32,7 +32,7 @@ Next steps:
 
   * Answering Agent → generates concise answers
 
-  * Translator Agent → ensures responses match user language (optional)
+  * Translator Agent → ensures responses match user language
 
 ## 📚 Knowledge Sources
 
