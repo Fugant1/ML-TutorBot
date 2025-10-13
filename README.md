@@ -71,6 +71,7 @@ Interface: Gradio
   ```
 3. Run:
   ```bash
-  docker build -t tutorbot .
-  docker run -p 8000:8000 tutorbot
+  docker compose build
+  docker compose up
+  python3 -m app.frontend.ui
   ```
