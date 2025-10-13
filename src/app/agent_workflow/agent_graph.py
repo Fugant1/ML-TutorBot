@@ -1,5 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_google_genai import GoogleGenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, END
 from langchain_experimental.tools.python.tool import PythonAstREPLTool
 from typing import TypedDict
@@ -16,12 +16,13 @@ class ChatState(TypedDict):
     output: str
     tool_calls: list[dict]
     tool_results: list[dict]
+    next_step: str
     retries: int
 
 async def router_node(state: ChatState, google_api_key, possible_tools:list[str]):
     #this node is the main node, it starts here and defines all the next steps
     #the router will decide which tool to use, the code interpreter or the RAG to help the user
-    llm = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
     #added a retry system to handle unpredicted behavior of the model
     state['retries'] = 0
     try:
@@ -37,8 +38,11 @@ async def router_node(state: ChatState, google_api_key, possible_tools:list[str]
             if state['retries'] > 3:
                 logging.error("Max retries exceeded and still couldn't understand the input")
                 return 'final_answer'
+        state['tool_calls'] = []
+        state['tool_results'] = []
         state['retries'] = 0
-        return response.content
+        state['next_step'] = response.content
+        return state
     except Exception as e:
         logging.error(f"Error while in router_node: {e}", traceback=True)
         state['retries'] += 1
@@ -49,7 +53,7 @@ async def router_node(state: ChatState, google_api_key, possible_tools:list[str]
 async def rag_retriever_node(state: ChatState):
     #throw all to the RAG pipeline to get the most relevant data
     rag = Rag_Pipeline()
-    rag_data = rag.query_docs(state['input'])
+    rag_data = await rag.query_docs(state['input'])
     #add the proper info to the state to the final_answer model be able to use it
     state['tool_calls'].append({'tool': 'rag_retriever', 'input': state['input']})
     state['tool_results'].append({'tool': 'rag_retriever', 'output': rag_data})
@@ -59,8 +63,8 @@ async def code_interpreter_node(state: ChatState, google_api_key):
     #this node is a bit more complex, we have a code spliter and interpreter and a final explainer and code builder
     #the first LLM will split the input in code and text and will return a brief description of what the code does or what error it has
     #the second LLM will be given the input, the code, the description and the output of the code, and will explain what the code does or what error it has and why
-    llm1 = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
-    llm2 = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
+    llm1 = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
+    llm2 = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0, api_key=google_api_key)
     prompt1 = ChatPromptTemplate.from_messages([
         ("system", """You are a code interpreter that is experts in python, what you will do:
             - Analyze the input and split in text and code
@@ -74,7 +78,7 @@ async def code_interpreter_node(state: ChatState, google_api_key):
     response = await llm1.ainvoke(formatted_prompt1)
     response_splited = response.content.split(' / ')
     code = response_splited[0]
-    explanation_or_error = response_splited[1] if len(response) > 1 else "No explanation or error provided."
+    explanation_or_error = response_splited[1] if len(response_splited) > 1 else "No explanation or error provided."
     tool = PythonAstREPLTool(description=code)
     code_run_return = await tool.arun(code)
     prompt2 = ChatPromptTemplate.from_messages([
@@ -93,7 +97,7 @@ async def code_interpreter_node(state: ChatState, google_api_key):
 async def final_answer_node(state: ChatState, google_api_key):
     #as simple as it looks, just give all the info to the model and let it answer
     #it will have the input, and the tool_results with the info of the RAG or the code interpreter if used
-    llm = GoogleGenAI(model="gemini-2.5-flash-lite", temperature=0.7, api_key=google_api_key)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0.7, api_key=google_api_key)
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are an expert in python and machine learning, what you will do:
             - You will be given the input and the results of some tools that were used to help you give the best answer possible
@@ -111,22 +115,32 @@ async def final_answer_node(state: ChatState, google_api_key):
     return state
 
 def create_graph(google_api_key: str):
-    #will add here the option of not use some tool, or adding other tools
     possible_tools = ['rag_retriever', 'code_interpreter']
-    builder = StateGraph.Builder()
+    builder = StateGraph(ChatState)
+    
 
-    builder.add_node("router", lambda state: router_node(state, google_api_key, possible_tools))
-    builder.add_node("rag_retriever", rag_retriever_node)
-    builder.add_node("code_interpreter", lambda state: code_interpreter_node(state, google_api_key))
-    builder.add_node("final_answer", lambda state: final_answer_node(state, google_api_key))
-    builder.set_entry_point("router")
-    builder.add_conditional_edge("router", router_node, {
-            "rag_retriever": "rag_retriever",
-            "code_interpreter": "code_interpreter",
-            "final_answer": "final_answer"
-        })
-    builder.add_edge("rag_retriever", "final_answer")
-    builder.add_edge("code_interpreter", "final_answer")
+
+    async def router_node_async(state: ChatState): return await router_node(state, google_api_key, possible_tools) 
+    async def rag_retriever_node_async(state: ChatState): return await rag_retriever_node(state) 
+    async def code_interpreter_node_async(state: ChatState): return await code_interpreter_node(state, google_api_key) 
+    async def final_answer_node_async(state: ChatState): return await final_answer_node(state, google_api_key) 
+    async def router_condition(state: ChatState):
+        next_step = state.get('next_step', 'final_answer')
+        if next_step not in ["rag_retriever", "code_interpreter", "final_answer"]:
+            next_step = "final_answer"
+        return next_step
+    builder.add_node("router", router_node_async) 
+    builder.add_node("rag_retriever", rag_retriever_node_async) 
+    builder.add_node("code_interpreter", code_interpreter_node_async) 
+    builder.add_node("final_answer", final_answer_node_async) 
+    builder.set_entry_point("router") 
+    builder.add_conditional_edges( "router", router_condition, 
+                                  { "rag_retriever": "rag_retriever", 
+                                   "code_interpreter": "code_interpreter", 
+                                   "final_answer": "final_answer", }, 
+                                   ) 
+    builder.add_edge("rag_retriever", "final_answer") 
+    builder.add_edge("code_interpreter", "final_answer") 
     builder.add_edge("final_answer", END)
 
     return builder.compile()

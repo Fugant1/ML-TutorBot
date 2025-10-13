@@ -11,8 +11,8 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 
-from app.core.config import URLS_DOCS, URLS_GUIDES
-from app.rag_pipelines.scrapping_manager import Scrap_manager
+from src.app.core.config import URLS_DOCS, URLS_GUIDES
+from src.app.rag_pipelines.scrapping_manager import Scrap_manager
 
 class Rag_Pipeline:
     def __init__(self):
@@ -47,7 +47,7 @@ class Rag_Pipeline:
 
     async def _load_docs(self):
         #pick all the data and load it to be processed
-        docs = await CSVLoader(file_path='data/data.csv', csv_args={'delimiter':';'}).aload()
+        docs = await CSVLoader(file_path='src/data/data.csv', csv_args={'delimiter':';'}).aload()
         return docs
 
     async def _split_docs(self, docs):
@@ -57,30 +57,30 @@ class Rag_Pipeline:
 
     async def _embedd_and_vec_store(self, splited_data):
         #just embedds
-        await Chroma.afrom_documents(documents=splited_data, embedding=self.embedded_model, persist_directory="./chroma_db")
+        await Chroma.afrom_documents(documents=splited_data, embedding=self.embedded_model, persist_directory="./src/chroma_db")
 
     async def _retrieve(self, input):
         #retrieve the most relevant data
-        vector_store = Chroma(persist_directory="./chroma_db", embedding_function=self.embedded_model)
+        vector_store = Chroma(persist_directory="./src/chroma_db", embedding_function=self.embedded_model)
         retrieve = vector_store.as_retriever()
         retrieved = await retrieve.ainvoke(input)
         return retrieved
 
     async def query_docs(self, input):
         #abstraction to call all the internal steps, just runs the pipeline and returns the query, aka the relevant docs
-        if not os.path.exists('data/data.csv'):
+        if not os.path.exists('src/data/data.csv'):
             await self._scrapp_data()
-        if not os.path.exists('./chroma_db'):
+        if not os.path.exists('./src/chroma_db'):
             #docs = await self._load_docs()
             #splited_data = await self._split_docs(docs)
-            splited_data = await self._load_and_split_large_csv('data/data.csv', 'text', 'source')
+            splited_data = await self._load_and_split_large_csv('src/data/data.csv', 'text', 'source')
             await self._embedd_and_vec_store(splited_data)
         query = await self._retrieve(input)
         return query
     
-if __name__ == '__main__':
-    qd = Rag_Pipeline()
-    related_text = asyncio.run(qd.query_docs("Logistic Regression"))
-    for doc in related_text:
-        print(f"Document source: {doc.metadata.get('source', 'N/A')}")
-        print(f"Document content: {doc.page_content}\n")
+# if __name__ == '__main__':
+#     qd = Rag_Pipeline()
+#     related_text = asyncio.run(qd.query_docs("Logistic Regression"))
+#     for doc in related_text:
+#         print(f"Document source: {doc.metadata.get('source', 'N/A')}")
+#         print(f"Document content: {doc.page_content}\n")

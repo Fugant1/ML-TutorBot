@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Query, Request 
 from contextlib import asynccontextmanager
 
-from agent_workflow.agent_graph import ChatState, create_graph
+from src.app.agent_workflow.agent_graph import ChatState, create_graph
 from dotenv import load_dotenv
 import os
 
@@ -16,8 +16,8 @@ async def lifespan(app: FastAPI):
 chat_router = FastAPI(lifespan=lifespan)
 
 @chat_router.get("/chat")
-def create_app(request: Request, input: str = Query(...)):
+async def create_app(request: Request, input: str = Query(...)):
     agent_graph = request.app.state.agent_graph
     state = ChatState(input=input)
-    state = agent_graph.invoke(state)
+    state = await agent_graph.ainvoke(state)
     return state

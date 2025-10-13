@@ -1,5 +1,5 @@
 import pandas as pd
-from app.rag_pipelines.scrapp_data import scrapp_data
+from src.app.rag_pipelines.scrapp_data import scrapp_data
 
 class Scrap_manager():
     def __init__(self, URLS):

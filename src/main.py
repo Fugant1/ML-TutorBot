@@ -1,1 +1,1 @@
-from app.api.api import chat_router as app
+from src.app.api.api import chat_router as app

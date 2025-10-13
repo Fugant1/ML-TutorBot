@@ -6,4 +6,7 @@ PyQt6
 langchain-google-genai
 langchain-community
 bs4
+lxml
 pandas
+langchain-experimental
+sentence-transformers
