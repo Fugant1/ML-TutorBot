@@ -5,6 +5,44 @@ import json
 
 CHAT_URL = "http://localhost:8000/chat?input={input}"
 
+# --- Custom CSS for styling (versão final e mais abrangente) ---
+custom_css = """
+/* --- AUMENTA O TAMANHO DE QUALQUER AVATAR NO CHATBOT --- */
+
+/* 1. Alvo: QUALQUER contêiner de avatar dentro do chatbot com nosso ID. */
+#chatbot_com_avatar_grande .avatar-container {
+    width: 65px !important;
+    height: 65px !important;
+}
+
+/* 2. Alvo: A imagem dentro de QUALQUER contêiner de avatar. */
+#chatbot_com_avatar_grande .avatar-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transform: scale(1.3) !important;
+}
+
+/* --- ESTILOS ANTERIORES (CONTINUAM IGUAIS) --- */
+
+#send_btn, #clear_btn, #stop_btn {
+    border-radius: 100px !important;
+}
+#user_input_textbox textarea {
+    border-radius: 100px !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+}
+#action_button_row {
+    justify-content: center;
+    gap: 12px;
+}
+#clear_btn {
+    flex-grow: 0 !important;
+    max-width: 250px !important;
+}
+"""
+
 def stream_chat(message: str, history: list):
     """
     Handles the chat logic, streaming the response to the UI.
@@ -60,7 +98,8 @@ theme = gr.themes.Soft(
     button_primary_background_fill_dark="linear-gradient(90deg, #358BCA, #5E4DB2)",
 )
 
-with gr.Blocks(theme=theme, title="ML Tutor Bot 🤖") as demo:
+# Pass the custom CSS to the Blocks layout
+with gr.Blocks(theme=theme, title="ML Tutor Bot 🤖", css=custom_css) as demo:
     gr.Markdown(
         """
         <div style="text-align: center;">
@@ -73,8 +112,12 @@ with gr.Blocks(theme=theme, title="ML Tutor Bot 🤖") as demo:
     chatbot = gr.Chatbot(
         label="Chat History",
         bubble_full_width=False,
-        avatar_images=(None, "https://www.gradio.app/images/gradio-logo.svg"), # User avatar, Bot avatar
+        # --- ATENÇÃO: SUBSTITUA O CAMINHO DA IMAGEM ABAIXO ---
+        # O primeiro elemento é o avatar do usuário (None para padrão), o segundo é o avatar do bot.
+        # Pode ser uma URL (ex: "https://www.example.com/bot_avatar.png") ou um caminho local (ex: "./bot_avatar.png")
+        avatar_images=(None, "frontend/static/ML-TutorBot.jpg"), # Exemplo: Use uma URL ou um caminho local aqui
         height=500,
+        elem_id="chatbot_com_avatar_grande"
     )
     
     with gr.Row():
@@ -83,12 +126,16 @@ with gr.Blocks(theme=theme, title="ML Tutor Bot 🤖") as demo:
             show_label=False,
             placeholder="Type your ML/Data Science question here...",
             container=False, 
+            elem_id="user_input_textbox", # Adicionado elem_id para estilizar com CSS
         )
-        send_btn = gr.Button("Send", variant="primary", scale=1, min_width=150)
+        # Add elem_id to apply specific CSS
+        send_btn = gr.Button("Send", variant="primary", scale=1, min_width=150, elem_id="send_btn")
 
-    with gr.Row():
-        clear_btn = gr.Button("🗑️ Clear History", variant="secondary")
-        stop_btn = gr.Button("Stop", variant="stop", visible=False)
+    # Add elem_id to the Row to center its content
+    with gr.Row(elem_id="action_button_row"):
+        # Add elem_id to apply specific CSS
+        clear_btn = gr.Button("🗑️ Clear History", variant="secondary", elem_id="clear_btn")
+        stop_btn = gr.Button("Stop", variant="stop", visible=False, elem_id="stop_btn")
 
     gr.Examples(
         examples=[
