@@ -1,12 +1,16 @@
-# ML TutorBot 🤖📚
-Your AI Data Science Tutor
+<p align="center">
+ Your AI Data Science Tutor
+</p>
 
-<img width="324" height="324" alt="image" src="https://github.com/user-attachments/assets/d29a629f-c4fb-4465-89a8-4ba42132978f" />
+<p align="center">
+  <img width="324" height="324" alt="ML TutorBot Logo" src="https://github.com/user-attachments/assets/d29a629f-c4fb-4465-89a8-4ba42132978f" />
+</p>
 
 ML TutorBot is a multilingual, AI-powered Data Science & Machine Learning tutor. It helps users understand ML/DS concepts, libraries, and techniques in a conversational way, using Retrieval-Augmented Generation (RAG) to provide accurate, contextual answers from curated knowledge sources.
 
-<img width="1886" height="893" alt="image" src="https://github.com/user-attachments/assets/7682c310-06b8-4c69-8a38-8919e4712360" />
-
+<p align="center">
+  <img width="1886" height="893" alt="ML TutorBot UI Screenshot" src="https://github.com/user-attachments/assets/7682c310-06b8-4c69-8a38-8919e4712360" />
+</p>
 ---
 
 ## 🗺️ Road Map:
