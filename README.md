@@ -20,6 +20,7 @@ Next steps:
 3. Add the API logic and user interaction ✅
 4. Make a simple frontend to improve the usabillity ✅
 5. Add the language detector and the translator agent 🔁
+6. Deploy it in Hostinger or some platform like that
 
 ---
 
