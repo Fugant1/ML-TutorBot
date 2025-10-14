@@ -99,7 +99,7 @@ async def final_answer_node(state: ChatState, google_api_key):
     #it will have the input, and the tool_results with the info of the RAG or the code interpreter if used
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0.7, api_key=google_api_key)
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are an expert in python and machine learning, what you will do:
+        ("system", """You are an expert in python and machine learning, answer shortly, what you will do:
             - You will be given the input and the results of some tools that were used to help you give the best answer possible
             - If the input is a question, answer it using the tool results if needed
             - If the input has no tool results, just answer it with your own knowledge if you can

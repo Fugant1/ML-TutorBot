@@ -2,6 +2,13 @@ import gradio as gr
 import requests
 import time
 import json
+import os
+
+BOT_AVATAR_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),  # pasta do ui.py
+    "static",
+    "ML-TutorBot.jpg"
+)
 
 CHAT_URL = "http://localhost:8000/chat?input={input}"
 
@@ -115,7 +122,7 @@ with gr.Blocks(theme=theme, title="ML Tutor Bot 🤖", css=custom_css) as demo:
         # --- ATENÇÃO: SUBSTITUA O CAMINHO DA IMAGEM ABAIXO ---
         # O primeiro elemento é o avatar do usuário (None para padrão), o segundo é o avatar do bot.
         # Pode ser uma URL (ex: "https://www.example.com/bot_avatar.png") ou um caminho local (ex: "./bot_avatar.png")
-        avatar_images=(None, "frontend/static/ML-TutorBot.jpg"), # Exemplo: Use uma URL ou um caminho local aqui
+        avatar_images=(None, BOT_AVATAR_PATH), # Exemplo: Use uma URL ou um caminho local aqui
         height=500,
         elem_id="chatbot_com_avatar_grande"
     )
