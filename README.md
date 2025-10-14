@@ -41,6 +41,63 @@ Next steps:
 
   * Translator Agent → ensures responses match user language
 
+## 📜 Flow Diagram
+
+```mermaid
+flowchart TD
+
+A[User in Gradio Frontend] -->|Sends question/request| B[API - api.py using FastAPI]
+
+B --> C[Agent Workflow]
+
+C -->|Analyzes input intent| D{Select Tool}
+
+D -->|General ML or DS question| E[RAG Pipeline]
+D -->|Requires code execution| F[Code Interpreter]
+
+E --> G[Retrieve from Chroma DB]
+E --> Z[Scrapp the data from notable source]
+Z --> X[Store the scrapped in the Vectorstore]
+X --> G[Retriever Agent fetches context from Chroma DB]
+G --> J[Provide all the information to the final answering agent]
+
+F --> K[Execute Python logic safely - sandboxed]
+K --> L[Return computed result or code output]
+L --> J
+
+J --> M[Translator Agent matches user language]
+M --> N[API sends response to Frontend]
+N -->|Displays explanation or result| O[User sees response in Frontend]
+```
+
+
+## 📁 Repository Structure
+
+```bash
+  ML-TutorBot/
+├── src/
+│   ├── app/
+│   │   ├── agent_workflow/        # Handles agent orchestration (Language, Retriever, Answering, Translator)
+│   │   ├── api/                   # FastAPI routes and API logic
+│   │   ├── core/                  # Core utilities, configs, and constants
+│   │   ├── frontend/              # Gradio UI components and design
+│   │   ├── rag_pipelines/         # RAG (Retrieval-Augmented Generation) logic and document retrieval flow
+│   │   ├── __init__.py
+│   │   └── main.py                # Entry point for backend execution
+│   │
+│   ├── data/                      # Preprocessed documents and text datasets for embeddings
+│   ├── chroma/                    # Vector database storage (Chroma persistence)
+│   ├── tests/                     # Unit and integration tests
+│   ├── __init__.py
+│   └── main.py                    # Application launcher
+│
+├── docker-compose.yml             # Docker multi-service setup (backend, vector DB, etc.)
+├── Dockerfile                     # Container definition for ML TutorBot
+├── requirements.txt               # Python dependencies
+├── README.md                      # Project documentation
+└── LICENSE                        # License file (if added)
+```
+
 ## 📚 Knowledge Sources
 
   * Official Documentation: scikit-learn, Pandas, NumPy, PyTorch, TensorFlow
