@@ -83,13 +83,12 @@ N -->|Displays explanation or result| O[User sees response in Frontend]
 │   │   ├── frontend/              # Gradio UI components and design
 │   │   ├── rag_pipelines/         # RAG (Retrieval-Augmented Generation) logic and document retrieval flow
 │   │   ├── __init__.py
-│   │   └── main.py                # Entry point for backend execution
 │   │
 │   ├── data/                      # Preprocessed documents and text datasets for embeddings
 │   ├── chroma/                    # Vector database storage (Chroma persistence)
 │   ├── tests/                     # Unit and integration tests
 │   ├── __init__.py
-│   └── main.py                    # Application launcher
+│   └── main.py                    # Entry point for backend execution
 │
 ├── docker-compose.yml             # Docker multi-service setup (backend, vector DB, etc.)
 ├── Dockerfile                     # Container definition for ML TutorBot
