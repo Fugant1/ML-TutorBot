@@ -82,7 +82,7 @@ N -->|Displays explanation or result| O[User sees response in Frontend]
 │   │   ├── core/                  # Core utilities, configs, and constants
 │   │   ├── frontend/              # Gradio UI components and design
 │   │   ├── rag_pipelines/         # RAG (Retrieval-Augmented Generation) logic and document retrieval flow
-│   │   ├── __init__.py
+│   │   └── __init__.py
 │   │
 │   ├── data/                      # Preprocessed documents and text datasets for embeddings
 │   ├── chroma/                    # Vector database storage (Chroma persistence)
