@@ -94,7 +94,7 @@ N -->|Displays explanation or result| O[User sees response in Frontend]
 ├── Dockerfile                     # Container definition for ML TutorBot
 ├── requirements.txt               # Python dependencies
 ├── README.md                      # Project documentation
-└── LICENSE                        # License file (if added)
+└── LICENSE                        # License file
 ```
 
 ## 📚 Knowledge Sources
