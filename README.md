@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
- <img width="326" height="326" alt="monkeypng" src="https://github.com/user-attachments/assets/4b7f9d7e-3c5e-40aa-9700-c9ef45082ba8" />
+ <img width="326" height="326" alt="ML-TutorBot" src="https://github.com/user-attachments/assets/53e781d7-4a98-41df-9d84-3eff5813382c" />
 </p>
 
 ML TutorBot is a multilingual, AI-powered Data Science & Machine Learning tutor. It helps users understand ML/DS concepts, libraries, and techniques in a conversational way, using Retrieval-Augmented Generation (RAG) to provide accurate, contextual answers from curated knowledge sources.
